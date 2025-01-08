@@ -1,0 +1,7 @@
+name: InventoryGoal
+version: '1.0-SNAPSHOT'
+main: yankay.inventoryGoal.InventoryGoal
+api-version: '1.21'
+prefix: InventoryGoal
+authors: [ Yankay ]
+description: A resource gathering plugin with an updatable table.
