@@ -43,7 +43,7 @@ public class ResourceCollectorListener implements Listener {
         event.setLine(2, "0/" + requiredAmount);
         event.setLine(3, "");
 
-        event.getPlayer().sendMessage("[InventoryGoal] §aТабличка создана для сбора: " + material.name() + " (" + requiredAmount + ")");
+        event.getPlayer().sendMessage("[InventoryGoal] §aТабличка создана для сбора: " + material.name() + " (" + requiredAmount + ") | by Yankay");
     }
 
     @EventHandler
