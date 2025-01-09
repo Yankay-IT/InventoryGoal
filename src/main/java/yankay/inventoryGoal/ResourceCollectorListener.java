@@ -16,15 +16,12 @@ public class ResourceCollectorListener implements Listener {
 
     @EventHandler
     public void onSignChange(SignChangeEvent event) {
-        String input = event.getLine(0);
+        String materialName = event.getLine(0).trim();
+        String amountStr = event.getLine(1).trim();
 
-        if (!input.contains(":")) return;
-
-        String[] parts = input.split(":");
-        if (parts.length != 2) return;
-
-        String materialName = parts[0].trim();
-        String amountStr = parts[1].trim();
+        if (materialName.isEmpty() || amountStr.isEmpty()) {
+            return;
+        }
 
         Material material = Material.matchMaterial(materialName.toUpperCase());
         if (material == null) {
@@ -36,10 +33,11 @@ public class ResourceCollectorListener implements Listener {
         try {
             requiredAmount = Integer.parseInt(amountStr);
         } catch (NumberFormatException e) {
-            event.getPlayer().sendMessage("[InventoryGoal] §cНекорректное количество ресурсов. Используйте format: Material:Amount");
+            event.getPlayer().sendMessage("[InventoryGoal] §cНекорректное количество ресурсов. Используйте формат: Material:Amount");
             return;
         }
 
+        // Устанавливаем текст на табличке
         event.setLine(0, "[InventoryGoal]");
         event.setLine(1, materialName.toLowerCase());
         event.setLine(2, "0/" + requiredAmount);
@@ -96,7 +94,6 @@ public class ResourceCollectorListener implements Listener {
             sign.setLine(2, collectedAmount + "/" + requiredAmount);
             sign.update();
 
-            // Лог для отладки
             Bukkit.getLogger().info("Updated sign: " + collectedAmount + "/" + requiredAmount + " of " + material.name());
 
             return;

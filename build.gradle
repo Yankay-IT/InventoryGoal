@@ -3,7 +3,7 @@ plugins {
 }
 
 group = 'yankay'
-version = '1.0-SNAPSHOT'
+version = 'release-v.1.0'
 
 repositories {
     mavenCentral()
