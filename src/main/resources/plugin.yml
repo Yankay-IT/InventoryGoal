@@ -1,5 +1,5 @@
 name: InventoryGoal
-version: 'release-v.1.0'
+version: 'release-v.2.0'
 main: yankay.inventoryGoal.InventoryGoal
 api-version: '1.21'
 prefix: InventoryGoal

@@ -1,16 +1,21 @@
 package yankay.inventoryGoal;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.block.BlockBreakEvent;
 
 public class ResourceCollectorListener implements Listener {
 
@@ -37,7 +42,6 @@ public class ResourceCollectorListener implements Listener {
             return;
         }
 
-        // Устанавливаем текст на табличке
         event.setLine(0, "[InventoryGoal]");
         event.setLine(1, materialName.toLowerCase());
         event.setLine(2, "0/" + requiredAmount);
@@ -52,7 +56,7 @@ public class ResourceCollectorListener implements Listener {
 
         Block chestBlock = chest.getBlock();
 
-        Block[] adjacentBlocks = new Block[]{
+        Block[] adjacentBlocks = new Block[] {
                 chestBlock.getRelative(1, 0, 0),
                 chestBlock.getRelative(-1, 0, 0),
                 chestBlock.getRelative(0, 0, 1),
@@ -95,8 +99,53 @@ public class ResourceCollectorListener implements Listener {
             sign.update();
 
             Bukkit.getLogger().info("Updated sign: " + collectedAmount + "/" + requiredAmount + " of " + material.name());
-
+            createArmorStandAboveChest(chestBlock, material);
             return;
         }
+    }
+
+    private void createArmorStandAboveChest(Block chestBlock, Material material) {
+        Location aboveChestLocation = chestBlock.getLocation().add(0.5, 0.2, 0.5); // Сдвиг на 0.5 по X и 1 по Y
+        ArmorStand armorStand = (ArmorStand) chestBlock.getWorld().spawnEntity(aboveChestLocation, EntityType.ARMOR_STAND);
+        armorStand.setVisible(false);
+        armorStand.setGravity(false);
+        armorStand.setSmall(true);
+        armorStand.setArms(false);
+        armorStand.setBasePlate(false);
+        armorStand.getEquipment().setHelmet(new ItemStack(material));
+        armorStand.setCustomNameVisible(false);
+    }
+
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent event) {
+        Block block = event.getBlock();
+
+        if (block.getState() instanceof Chest) {
+            Chest chest = (Chest) block.getState();
+            ArmorStand armorStand = findArmorStandAboveChest(chest.getBlock());
+            if (armorStand != null) {
+                armorStand.remove();
+            }
+        } else if (block.getState() instanceof Sign) {
+            Sign sign = (Sign) block.getState();
+            if ("[InventoryGoal]".equalsIgnoreCase(sign.getLine(0))) {
+                ArmorStand armorStand = findArmorStandAboveChest(block);
+                if (armorStand != null) {
+                    armorStand.remove();
+                }
+            }
+        }
+    }
+
+    private ArmorStand findArmorStandAboveChest(Block chestBlock) {
+        Location aboveChestLocation = chestBlock.getLocation().add(0.5, 0.2, 0.5);
+
+        for (Entity entity : chestBlock.getWorld().getEntitiesByClass(ArmorStand.class)) {
+            if (entity.getLocation().getBlock().equals(aboveChestLocation.getBlock())) {
+                return (ArmorStand) entity;
+            }
+        }
+        return null;
     }
 }
